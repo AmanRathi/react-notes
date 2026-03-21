@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aman's React Notes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* THEME VARIABLES */
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --border: #2d3148;
+      --border-hover: #3d4268;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --text-strong: #cbd5e1;
+      --code-bg: #0f1117;
+      --accent: #61dafb;
+      --table-row-hover: #ffffff05;
+      --td-border: #1e2235;
+    }
+
+    body.light {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #94a3b8;
+      --text-strong: #1e293b;
+      --code-bg: #f1f5f9;
+      --accent: #0284c7;
+      --table-row-hover: #00000005;
+      --td-border: #e2e8f0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .header-top h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .header-top .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-subtle);
+      margin-left: auto;
+    }
+
+    .react-logo {
+      font-size: 1.8rem;
+    }
+
+    /* SEARCH */
+    .search-wrapper {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-input::placeholder { color: var(--text-subtle); }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      font-size: 1rem;
+    }
+
+    .search-count {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    /* LAYOUT */
+    .container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      padding: 24px 16px;
+      position: sticky;
+      top: 105px;
+      height: calc(100vh - 105px);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+    }
+
+    .sidebar h3 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-subtle);
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+
+    .sidebar-link {
+      display: block;
+      padding: 7px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-link:hover {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    .sidebar-link.active {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 900px;
+    }
+
+    /* TOPIC CARDS */
+    .topic-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .topic-card:hover {
+      border-color: var(--border-hover);
+    }
+
+    .topic-card.hidden {
+      display: none;
+    }
+
+    .topic-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .topic-number {
+      background: #61dafb22;
+      color: #61dafb;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .topic-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .topic-tag {
+      margin-left: auto;
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .tag-setup { background: #1e3a5f33; color: #3b82f6; }
+    .tag-concepts { background: #1e3a2f33; color: #16a34a; }
+    .tag-jsx { background: #3a1e3a33; color: #9333ea; }
+    .tag-css { background: #3a2a1e33; color: #ea580c; }
+    .tag-props { background: #3a1e2a33; color: #db2777; }
+    .tag-rendering { background: #1e3a3a33; color: #0d9488; }
+
+    body.light .tag-setup { background: #dbeafe; color: #1d4ed8; }
+    body.light .tag-concepts { background: #dcfce7; color: #15803d; }
+    body.light .tag-jsx { background: #f3e8ff; color: #7e22ce; }
+    body.light .tag-css { background: #ffedd5; color: #c2410c; }
+    body.light .tag-props { background: #fce7f3; color: #be185d; }
+    body.light .tag-rendering { background: #ccfbf1; color: #0f766e; }
+
+    .topic-body {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .topic-body p { margin-bottom: 12px; }
+    .topic-body p:last-child { margin-bottom: 0; }
+
+    .topic-body strong {
+      color: var(--text-strong);
+      font-weight: 600;
+    }
+
+    /* CODE BLOCKS */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 12px 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      transition: background 0.2s;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      color: var(--text);
+    }
+
+    .inline-code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85em;
+      color: var(--accent);
+    }
+
+    /* HIGHLIGHT */
+    .highlight { background: #61dafb33; border-radius: 3px; }
+    body.light .highlight { background: #bae6fd; }
+
+    /* CALLOUT */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: #61dafb11;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 12px 0;
+      font-size: 0.9rem;
+      color: var(--text-strong);
+    }
+
+    body.light .callout { background: #e0f2fe; }
+
+    .callout.warning {
+      border-left-color: #f59e0b;
+      background: #f59e0b11;
+    }
+
+    body.light .callout.warning { background: #fef3c7; }
+
+    .callout.error {
+      border-left-color: #f87171;
+      background: #f8717111;
+    }
+
+    body.light .callout.error { background: #fee2e2; }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--code-bg);
+      color: var(--accent);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--td-border);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--table-row-hover); }
+
+    /* NO RESULTS */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-subtle);
+      display: none;
+    }
+
+    .no-results .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+    /* SCROLL TO TOP */
+    .scroll-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: #61dafb;
+      color: #0f1117;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px #61dafb44;
+      transition: transform 0.2s;
+    }
+
+    .scroll-top:hover { transform: scale(1.1); }
+    .scroll-top.visible { display: flex; }
+
+    /* SYNTAX COLORS — dark */
+    .kw { color: #c084fc; }
+    .fn { color: #60a5fa; }
+    .str { color: #4ade80; }
+    .cmt { color: #4a5568; }
+    .tag-c { color: #f87171; }
+    .attr { color: #fb923c; }
+    .num { color: #f59e0b; }
+
+    /* SYNTAX COLORS — light */
+    body.light .kw { color: #7c3aed; }
+    body.light .fn { color: #1d4ed8; }
+    body.light .str { color: #15803d; }
+    body.light .cmt { color: #94a3b8; }
+    body.light .tag-c { color: #dc2626; }
+    body.light .attr { color: #c2410c; }
+    body.light .num { color: #b45309; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="react-logo">⚛️</span>
+      <h1>Aman's React Notes</h1>
+      <span class="subtitle">Updated as you learn</span>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+    </div>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search topics, concepts, code..." />
+      <span class="search-count" id="searchCount"></span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <h3>Topics</h3>
+      <a class="sidebar-link" href="#t1">npm create vite@latest</a>
+      <a class="sidebar-link" href="#t2">What build tools do</a>
+      <a class="sidebar-link" href="#t3">npm run dev</a>
+      <a class="sidebar-link" href="#t4">Checking versions</a>
+      <a class="sidebar-link" href="#t5">npm alternatives</a>
+      <a class="sidebar-link" href="#t6">CLI & Bash</a>
+      <a class="sidebar-link" href="#t7">CLI examples</a>
+      <a class="sidebar-link" href="#t8">Project folder structure</a>
+      <a class="sidebar-link" href="#t9">Root vs child components</a>
+      <a class="sidebar-link" href="#t10">Multiple root components</a>
+      <a class="sidebar-link" href="#t11">Import paths (./ vs no ./)</a>
+      <a class="sidebar-link" href="#t12">new Xyz vs new Xyz()</a>
+      <a class="sidebar-link" href="#t13">JSX curly braces</a>
+      <a class="sidebar-link" href="#t14">Statements in JSX</a>
+      <a class="sidebar-link" href="#t15">Function vs class components</a>
+      <a class="sidebar-link" href="#t16">CSS in React</a>
+      <a class="sidebar-link" href="#t17">CSS Modules example</a>
+      <a class="sidebar-link" href="#t18">Global CSS placement</a>
+      <a class="sidebar-link" href="#t19">Tag selectors in modules</a>
+      <a class="sidebar-link" href="#t20">Props</a>
+      <a class="sidebar-link" href="#t21">PropTypes</a>
+      <a class="sidebar-link" href="#t22">Default Props</a>
+      <a class="sidebar-link" href="#t23">JSX elements in variables</a>
+      <a class="sidebar-link" href="#t24">Conditional rendering</a>
+      <a class="sidebar-link" href="#t25">Logical operators in JSX</a>
+      <a class="sidebar-link" href="#t26">Rendering lists</a>
+      <a class="sidebar-link" href="#t27">The key prop</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" id="mainContent">
+
+      <!-- 1 -->
+      <div class="topic-card" id="t1" data-title="npm create vite latest vs npm init">
+        <div class="topic-header">
+          <span class="topic-number">01</span>
+          <span class="topic-title">npm create vite@latest vs npm init</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>npm create vite@latest</strong> downloads and runs the Vite scaffolding tool. It asks questions (project name, framework, TypeScript or JS) and generates a complete, ready-to-code project with folder structure, config files, and sample components. Then you run <span class="inline-code">npm install</span> and you're ready.</p>
+          <p><strong>npm init</strong> is a bare-bones command built into npm itself. It only creates a <span class="inline-code">package.json</span> file — nothing else. You'd then have to manually install React, set up Vite, create all your files, and configure everything from scratch.</p>
+          <div class="callout">💡 For learning React, always use <strong>npm create vite@latest</strong> — it replaced the older create-react-app that you may see in older tutorials.</div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="topic-card" id="t2" data-title="what build tools do vite webpack bundling transpiling">
+        <div class="topic-header">
+          <span class="topic-number">02</span>
+          <span class="topic-title">What build tools actually do</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p>Browsers can't understand JSX or modern JS imports directly. Build tools sit between your code and the browser:</p>
+          <p><strong>Bundling</strong> — stitches all your files into one (or a few) optimized files so the browser doesn't make 50+ network requests.</p>
+          <p><strong>Transpiling</strong> — converts JSX like <span class="inline-code">&lt;App /&gt;</span> into <span class="inline-code">React.createElement(...)</span> that the browser understands.</p>
+          <p><strong>Dev Server</strong> — when you run <span class="inline-code">npm run dev</span>, Vite spins up a local server with Hot Module Replacement (HMR) — only changed parts update instantly without a full page reload.</p>
+          <p><strong>Production build</strong> — <span class="inline-code">npm run build</span> minifies code, removes unused code (tree-shaking), and produces a lean <span class="inline-code">dist/</span> folder ready to deploy.</p>
+          <div class="callout">💡 Build tools are translators + optimizers. They turn developer-friendly code into browser-friendly, fast, production-ready code.</div>
+          <table>
+            <tr><th>Tool</th><th>Notes</th></tr>
+            <tr><td>Vite</td><td>Fast, modern, current standard for learning</td></tr>
+            <tr><td>Create React App</td><td>Old, slow, largely outdated</td></tr>
+            <tr><td>Webpack</td><td>Powerful, used in large enterprise projects</td></tr>
+            <tr><td>Next.js</td><td>Full React framework — SSR, routing, API routes</td></tr>
+            <tr><td>Parcel</td><td>Zero-config, good for quick prototypes</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="topic-card" id="t3" data-title="npm run dev scripts package.json vite">
+        <div class="topic-header">
+          <span class="topic-number">03</span>
+          <span class="topic-title">npm run dev & scripts</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p>Yes, <span class="inline-code">npm run dev</span> comes pre-configured by Vite. It's defined in <span class="inline-code">package.json</span> under the scripts section:</p>
+          <pre><code><span class="str">"scripts"</span>: {
+  <span class="str">"dev"</span>: <span class="str">"vite"</span>,
+  <span class="str">"build"</span>: <span class="str">"vite build"</span>,
+  <span class="str">"preview"</span>: <span class="str">"vite preview"</span>
+}</code></pre>
+          <p><span class="inline-code">npm run dev</span> starts the dev server. <span class="inline-code">npm run build</span> creates the production build. <span class="inline-code">npm run preview</span> locally tests your production build.</p>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="topic-card" id="t4" data-title="check version npm package list outdated">
+        <div class="topic-header">
+          <span class="topic-number">04</span>
+          <span class="topic-title">Checking package versions</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt"># Check installed version in your project</span>
+npm list vite
+npm list react
+
+<span class="cmt"># Check latest available version on npm</span>
+npm show vite version
+npm show react version
+
+<span class="cmt"># See all outdated packages at once</span>
+npm outdated
+
+<span class="cmt"># Check globally installed packages</span>
+npm list -g &lt;package-name&gt;</code></pre>
+          <div class="callout">💡 The exact versions of everything are also in <strong>package-lock.json</strong> — auto-generated, don't edit manually.</div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="topic-card" id="t5" data-title="npm alternatives pnpm yarn bun package manager">
+        <div class="topic-header">
+          <span class="topic-number">05</span>
+          <span class="topic-title">npm alternatives</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <table>
+            <tr><th>Tool</th><th>Speed</th><th>Disk Usage</th><th>Notes</th></tr>
+            <tr><td>npm</td><td>Medium</td><td>High</td><td>Built into Node.js, most stable</td></tr>
+            <tr><td>pnpm</td><td>Fast</td><td>Low</td><td>Most popular alternative, near-identical commands</td></tr>
+            <tr><td>Yarn</td><td>Fast</td><td>Medium</td><td>Created by Facebook, still popular in older projects</td></tr>
+            <tr><td>Bun</td><td>Fastest</td><td>Low</td><td>New runtime + bundler + package manager, still maturing</td></tr>
+          </table>
+          <div class="callout">💡 Stick with npm while learning. Switch to pnpm once you're comfortable — it's the best alternative right now.</div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="topic-card" id="t6" data-title="CLI bash terminal shell command line interface">
+        <div class="topic-header">
+          <span class="topic-number">06</span>
+          <span class="topic-title">CLI & Bash</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>CLI (Command Line Interface)</strong> — a way to interact with your computer by typing text commands instead of clicking. The app you type into is called a terminal.</p>
+          <p><strong>Bash</strong> — a specific shell language that runs inside the terminal. It interprets and executes your commands. Most common on Mac/Linux. On Windows the equivalents are Command Prompt and PowerShell. On newer Macs the default is zsh (very similar to bash).</p>
+          <p><strong>Terminal</strong> = the window. <strong>Shell (Bash)</strong> = the engine inside. <strong>CLI</strong> = the concept of text-based interaction.</p>
+          <div class="callout">💡 GUI (buttons & clicks) = talking to your computer with a mouse. CLI (text commands) = talking to your computer with words.</div>
+          <p>Every CLI command follows the same structure:</p>
+          <pre><code>&lt;tool-name&gt;  &lt;command&gt;  &lt;options&gt;
+    npm        install    react
+    git         commit   -m "message"</code></pre>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="topic-card" id="t7" data-title="CLI examples git npm bash commands terminal">
+        <div class="topic-header">
+          <span class="topic-number">07</span>
+          <span class="topic-title">CLI examples</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt"># Navigating your computer</span>
+cd my-project          <span class="cmt"># change directory</span>
+ls                     <span class="cmt"># list files (Mac/Linux)</span>
+mkdir new-folder       <span class="cmt"># make a new folder</span>
+rm file.txt            <span class="cmt"># delete a file</span>
+
+<span class="cmt"># Git (version control)</span>
+git status             <span class="cmt"># see what changed</span>
+git add .              <span class="cmt"># stage changes</span>
+git commit -m "msg"    <span class="cmt"># save a snapshot</span>
+git push               <span class="cmt"># upload to GitHub</span>
+
+<span class="cmt"># Running apps</span>
+npm run dev            <span class="cmt"># start Vite dev server</span>
+node index.js          <span class="cmt"># run a Node.js file</span>
+
+<span class="cmt"># Package management</span>
+npm install react      <span class="cmt"># install a package</span>
+pip install pandas     <span class="cmt"># Python package manager</span></code></pre>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="topic-card" id="t8" data-title="folder structure src App.jsx main.jsx index.html assets">
+        <div class="topic-header">
+          <span class="topic-number">08</span>
+          <span class="topic-title">Project folder structure</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>main.jsx</strong> — entry point of your app. First JS file that runs. Mounts your React app into the HTML page. Rarely edited.</p>
+          <p><strong>App.jsx</strong> — root component. Starting point of your actual UI. Where you spend most of your time early on.</p>
+          <p><strong>App.css</strong> — styles specifically for App.jsx.</p>
+          <p><strong>index.css</strong> — global styles for the entire app (fonts, body resets, etc).</p>
+          <p><strong>assets/</strong> — static files like images and SVGs.</p>
+          <p><strong>index.html</strong> (outside src) — the single HTML file the browser loads. Contains <span class="inline-code">&lt;div id="root"&gt;&lt;/div&gt;</span> — an empty div that React injects your entire app into.</p>
+          <pre><code>Browser loads index.html
+        ↓
+Finds and runs main.jsx
+        ↓
+main.jsx renders &lt;App /&gt; into the #root div
+        ↓
+App.jsx builds the UI from there</code></pre>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="topic-card" id="t9" data-title="root component child components tree parent non-root">
+        <div class="topic-header">
+          <span class="topic-number">09</span>
+          <span class="topic-title">Root vs child components</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>Root component</strong> — the top-level component of your app (App.jsx). Everything else lives inside it. There is only one root component in a normal React app.</p>
+          <p><strong>Child components</strong> — everything else you create. Reusable pieces of UI that you plug into your app.</p>
+          <pre><code>App.jsx  (root)
+├── Navbar.jsx
+├── Sidebar.jsx
+└── MainContent.jsx
+    ├── ProductCard.jsx
+    ├── ProductCard.jsx
+    └── ProductCard.jsx</code></pre>
+          <div class="callout">💡 Think of your UI like LEGO. The root component is the base plate, every other component is a brick. Each brick can hold smaller bricks — that's the component tree.</div>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="topic-card" id="t10" data-title="multiple root components createRoot single tree">
+        <div class="topic-header">
+          <span class="topic-number">10</span>
+          <span class="topic-title">Can there be multiple root components?</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>No</strong> — there can only be one root component in a React app. main.jsx mounts exactly one component into the #root div.</p>
+          <p>Technically you can create multiple React roots on one page, but this is only done when gradually migrating an old website to React — not in normal apps.</p>
+          <div class="callout">💡 One React app = one root component (App.jsx) = one component tree. No matter how large your app grows, it all traces back to that single App.jsx.</div>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="topic-card" id="t11" data-title="import statement ./ path node_modules package local file">
+        <div class="topic-header">
+          <span class="topic-number">11</span>
+          <span class="topic-title">Import paths — ./ vs no ./</span>
+          <span class="topic-tag tag-jsx">JSX</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">// No ./ = npm package from node_modules</span>
+<span class="kw">import</span> { useState } <span class="kw">from</span> <span class="str">"react"</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">"axios"</span>
+
+<span class="cmt">// ./ = local file relative to current file</span>
+<span class="kw">import</span> Navbar <span class="kw">from</span> <span class="str">"./components/Navbar"</span>
+<span class="kw">import</span> <span class="str">"./App.css"</span>
+
+<span class="cmt">// ../ = go one folder up first</span>
+<span class="kw">import</span> Button <span class="kw">from</span> <span class="str">"../components/Button"</span></code></pre>
+          <table>
+            <tr><th>Starts with</th><th>Means</th></tr>
+            <tr><td>No ./</td><td>npm package from node_modules</td></tr>
+            <tr><td>./</td><td>file relative to current file</td></tr>
+            <tr><td>../</td><td>go one folder up first</td></tr>
+          </table>
+          <div class="callout">💡 No dot = someone else's code (installed package). Dot = your own code (your project files).</div>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="topic-card" id="t12" data-title="new Xyz parentheses constructor javascript">
+        <div class="topic-header">
+          <span class="topic-number">12</span>
+          <span class="topic-title">new Xyz vs new Xyz()</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>They are identical</strong> when no arguments are passed. Parentheses are optional with zero arguments.</p>
+          <p>Parentheses become required when passing arguments: <span class="inline-code">new Xyz(arg1, arg2)</span></p>
+          <div class="callout warning">⚠️ Always write <strong>new Xyz()</strong> with parentheses — it's more readable, consistent, and avoids subtle operator precedence bugs.</div>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="topic-card" id="t13" data-title="JSX curly braces expressions statements javascript">
+        <div class="topic-header">
+          <span class="topic-number">13</span>
+          <span class="topic-title">JSX curly braces — expressions only</span>
+          <span class="topic-tag tag-jsx">JSX</span>
+        </div>
+        <div class="topic-body">
+          <p>Only <strong>expressions</strong> (things that return a value) can go inside <span class="inline-code">{}</span> in JSX. Statements (if, for, let) are not allowed.</p>
+          <pre><code><span class="cmt">// ✅ Expressions — allowed</span>
+{val1}
+{2 + 2}
+{isLoggedIn ? <span class="str">"Yes"</span> : <span class="str">"No"</span>}
+{getName()}
+{count > 0}
+
+<span class="cmt">// ❌ Statements — not allowed</span>
+{<span class="kw">if</span> (x > 0) {...}}
+{<span class="kw">for</span> (<span class="kw">let</span> i...) {...}}
+{<span class="kw">let</span> x = 5}</code></pre>
+          <div class="callout">💡 If you can <strong>console.log()</strong> it directly, it's an expression and will work in JSX curly braces.</div>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="topic-card" id="t14" data-title="statements JSX above return two zones if for loop">
+        <div class="topic-header">
+          <span class="topic-number">14</span>
+          <span class="topic-title">Using statements in JSX</span>
+          <span class="topic-tag tag-jsx">JSX</span>
+        </div>
+        <div class="topic-body">
+          <p>Move logic above the return statement — that's normal JavaScript land where anything goes:</p>
+          <pre><code><span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="cmt">// ZONE 1 — JS land: if, for, let, const all fine here</span>
+  <span class="kw">let</span> message
+  <span class="kw">if</span> (isLoggedIn) {
+    message = <span class="str">"Welcome back!"</span>
+  } <span class="kw">else</span> {
+    message = <span class="str">"Please login"</span>
+  }
+
+  <span class="kw">return</span> (
+    <span class="cmt">// ZONE 2 — JSX land: only expressions in {}</span>
+    <span class="tag-c">&lt;div&gt;</span>{message}<span class="tag-c">&lt;/div&gt;</span>
+  )
+}</code></pre>
+          <table>
+            <tr><th>Instead of</th><th>Use inline</th></tr>
+            <tr><td>if/else</td><td>ternary ? :</td></tr>
+            <tr><td>if only</td><td>&amp;&amp; operator</td></tr>
+            <tr><td>for loop</td><td>.map()</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="topic-card" id="t15" data-title="function component class component hooks useState">
+        <div class="topic-header">
+          <span class="topic-number">15</span>
+          <span class="topic-title">Function vs class components</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">// ✅ Function component (modern — use this)</span>
+<span class="kw">function</span> <span class="fn">Header</span>() {
+  <span class="kw">return</span> <span class="tag-c">&lt;h1&gt;</span>Hello World<span class="tag-c">&lt;/h1&gt;</span>
+}
+
+<span class="cmt">// ❌ Class component (old — avoid)</span>
+<span class="kw">class</span> <span class="fn">Header</span> <span class="kw">extends</span> React.Component {
+  <span class="fn">render</span>() {
+    <span class="kw">return</span> <span class="tag-c">&lt;h1&gt;</span>Hello World<span class="tag-c">&lt;/h1&gt;</span>
+  }
+}</code></pre>
+          <p>Before 2019, class components were needed for state and lifecycle methods. React introduced <strong>Hooks</strong> in 2019 (useState, useEffect) allowing function components to do everything — with much cleaner code. The whole industry moved to function components.</p>
+          <table>
+            <tr><th></th><th>Function</th><th>Class</th></tr>
+            <tr><td>Syntax</td><td>Simple</td><td>Verbose</td></tr>
+            <tr><td>Hooks</td><td>✅ Yes</td><td>❌ No</td></tr>
+            <tr><td>this keyword</td><td>❌ Not needed</td><td>✅ Required everywhere</td></tr>
+            <tr><td>Usage</td><td>Modern standard</td><td>Legacy codebases</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="topic-card" id="t16" data-title="CSS in React global modules inline styled components tailwind">
+        <div class="topic-header">
+          <span class="topic-number">16</span>
+          <span class="topic-title">CSS in React — all approaches</span>
+          <span class="topic-tag tag-css">CSS</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>1. Global CSS</strong> — regular .css files imported in main.jsx. Applies everywhere.</p>
+          <p><strong>2. CSS Modules</strong> — .module.css files scoped to a single component. Most recommended for component styles.</p>
+          <p><strong>3. Inline Styles</strong> — style object directly in JSX. Note double braces and camelCase:</p>
+          <pre><code><span class="tag-c">&lt;button</span> <span class="attr">style</span>={{ <span class="str">backgroundColor</span>: <span class="str">"blue"</span>, <span class="str">color</span>: <span class="str">"white"</span> }}<span class="tag-c">&gt;</span>
+  Click
+<span class="tag-c">&lt;/button&gt;</span></code></pre>
+          <p><strong>4. CSS-in-JS</strong> — libraries like Styled Components. CSS written inside JS files.</p>
+          <p><strong>5. Tailwind CSS</strong> — most popular in industry right now. Pre-built utility classes applied directly in JSX. No CSS files needed.</p>
+          <table>
+            <tr><th>Method</th><th>Scope</th><th>Popularity</th></tr>
+            <tr><td>Tailwind CSS</td><td>Utility classes</td><td>Most popular in new projects</td></tr>
+            <tr><td>CSS Modules</td><td>Component-scoped</td><td>Very common, solid choice</td></tr>
+            <tr><td>CSS-in-JS</td><td>Component-scoped</td><td>Popular in older codebases</td></tr>
+            <tr><td>Global CSS</td><td>App-wide</td><td>Used alongside others</td></tr>
+            <tr><td>Inline styles</td><td>Element-scoped</td><td>Avoided except for dynamic values</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="topic-card" id="t17" data-title="CSS modules example className styles scoped">
+        <div class="topic-header">
+          <span class="topic-number">17</span>
+          <span class="topic-title">CSS Modules — full example</span>
+          <span class="topic-tag tag-css">CSS</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">/* Button.module.css */</span>
+.btn {
+  background-color: blue;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+}</code></pre>
+          <pre><code><span class="cmt">// Button.jsx</span>
+<span class="kw">import</span> styles <span class="kw">from</span> <span class="str">"./Button.module.css"</span>
+
+<span class="kw">function</span> <span class="fn">Button</span>() {
+  <span class="kw">return</span> (
+    <span class="tag-c">&lt;button</span> <span class="attr">className</span>={styles.btn}<span class="tag-c">&gt;</span>
+      Click me
+    <span class="tag-c">&lt;/button&gt;</span>
+  )
+}
+<span class="kw">export default</span> Button</code></pre>
+          <div class="callout error">❌ Common mistake: using <strong>style</strong> instead of <strong>className</strong> with CSS Modules. Always use className={styles.btn}</div>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="topic-card" id="t18" data-title="global CSS placement main.jsx index.css entry point">
+        <div class="topic-header">
+          <span class="topic-number">18</span>
+          <span class="topic-title">Where to add global CSS</span>
+          <span class="topic-tag tag-css">CSS</span>
+        </div>
+        <div class="topic-body">
+          <p>Global CSS should be imported in <strong>main.jsx</strong> — the entry point of the app. This makes it available everywhere, which is exactly what global styles should be.</p>
+          <table>
+            <tr><th>CSS Type</th><th>Where to import</th></tr>
+            <tr><td>Global styles (index.css)</td><td>main.jsx</td></tr>
+            <tr><td>Component styles (App.css)</td><td>App.jsx</td></tr>
+            <tr><td>Module styles (Button.module.css)</td><td>Button.jsx</td></tr>
+          </table>
+          <div class="callout">💡 Global CSS lives at the top (main.jsx), component CSS lives with its component.</div>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="topic-card" id="t19" data-title="tag selectors CSS modules global scope break">
+        <div class="topic-header">
+          <span class="topic-number">19</span>
+          <span class="topic-title">Tag selectors in CSS Modules break scope</span>
+          <span class="topic-tag tag-css">CSS</span>
+        </div>
+        <div class="topic-body">
+          <p>CSS Modules scoping only works for <strong>class selectors</strong>. Tag selectors become global:</p>
+          <pre><code><span class="cmt">/* Button.module.css */</span>
+button { background: blue; }  <span class="cmt">/* ❌ affects ALL buttons in the app */</span>
+.btn { background: blue; }    <span class="cmt">/* ✅ only affects this component */</span></code></pre>
+          <p>CSS Modules transforms class names into unique ones (<span class="inline-code">.btn → .btn_x7k2p</span>) but has no way to make tag selectors unique — they stay as-is and apply globally.</p>
+          <div class="callout">💡 Always use class selectors inside .module.css files. Tag selectors belong in index.css (global) only — for intentional app-wide styles like resets.</div>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="topic-card" id="t20" data-title="props properties component pass data destructuring">
+        <div class="topic-header">
+          <span class="topic-number">20</span>
+          <span class="topic-title">Props</span>
+          <span class="topic-tag tag-props">Props</span>
+        </div>
+        <div class="topic-body">
+          <p>Props (properties) are how you pass data from a parent component to a child component.</p>
+          <pre><code><span class="cmt">// Passing props from App.jsx</span>
+<span class="tag-c">&lt;Student</span> <span class="attr">name</span>=<span class="str">"Aman"</span> <span class="attr">age</span>={22} <span class="attr">interest</span>=<span class="str">"React"</span> <span class="tag-c">/&gt;</span>
+
+<span class="cmt">// Receiving props in Student.jsx</span>
+<span class="kw">function</span> <span class="fn">Student</span>(props) {
+  <span class="kw">return</span> (
+    <span class="tag-c">&lt;div&gt;</span>
+      <span class="tag-c">&lt;p&gt;</span>Name: {props.name}<span class="tag-c">&lt;/p&gt;</span>
+      <span class="tag-c">&lt;p&gt;</span>Age: {props.age}<span class="tag-c">&lt;/p&gt;</span>
+    <span class="tag-c">&lt;/div&gt;</span>
+  )
+}
+
+<span class="cmt">// Cleaner with destructuring (preferred)</span>
+<span class="kw">function</span> <span class="fn">Student</span>({ name, age, interest }) {
+  <span class="kw">return</span> <span class="tag-c">&lt;p&gt;</span>{name}<span class="tag-c">&lt;/p&gt;</span>   <span class="cmt">// no props. prefix needed</span>
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- 21 -->
+      <div class="topic-card" id="t21" data-title="PropTypes validation type checking string number required">
+        <div class="topic-header">
+          <span class="topic-number">21</span>
+          <span class="topic-title">PropTypes</span>
+          <span class="topic-tag tag-props">Props</span>
+        </div>
+        <div class="topic-body">
+          <p>PropTypes validate the props your component receives. Warns you in the console if wrong data types are passed.</p>
+          <pre><code><span class="kw">import</span> PropTypes <span class="kw">from</span> <span class="str">'prop-types'</span>
+
+Student.propTypes = {
+  name: PropTypes.string.isRequired,
+  age: PropTypes.number.isRequired,
+  interest: PropTypes.string         <span class="cmt">// optional</span>
+}</code></pre>
+          <table>
+            <tr><th>Type</th><th>Usage</th></tr>
+            <tr><td>String</td><td>PropTypes.string</td></tr>
+            <tr><td>Number</td><td>PropTypes.number</td></tr>
+            <tr><td>Boolean</td><td>PropTypes.bool</td></tr>
+            <tr><td>Function</td><td>PropTypes.func</td></tr>
+            <tr><td>Array</td><td>PropTypes.array</td></tr>
+            <tr><td>Object</td><td>PropTypes.object</td></tr>
+          </table>
+          <div class="callout">💡 PropTypes only run in development mode. In professional projects, TypeScript is used instead — more powerful and catches errors before you run the code.</div>
+        </div>
+      </div>
+
+      <!-- 22 -->
+      <div class="topic-card" id="t22" data-title="default props defaultProps destructuring fallback values">
+        <div class="topic-header">
+          <span class="topic-number">22</span>
+          <span class="topic-title">Default Props</span>
+          <span class="topic-tag tag-props">Props</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">// ❌ Old way — defaultProps (being phased out)</span>
+Student.defaultProps = {
+  interest: <span class="str">"Not specified"</span>
+}
+
+<span class="cmt">// ✅ Modern way — defaults in destructuring (preferred)</span>
+<span class="kw">function</span> <span class="fn">Student</span>({
+  name = <span class="str">"Anonymous"</span>,
+  age = <span class="num">0</span>,
+  interest = <span class="str">"Not specified"</span>
+}) {
+  <span class="kw">return</span> <span class="tag-c">&lt;p&gt;</span>{name}<span class="tag-c">&lt;/p&gt;</span>
+}</code></pre>
+          <div class="callout warning">⚠️ React has officially deprecated defaultProps for function components. Always use destructuring defaults in 2026.</div>
+        </div>
+      </div>
+
+      <!-- 23 -->
+      <div class="topic-card" id="t23" data-title="JSX elements variables store React.createElement">
+        <div class="topic-header">
+          <span class="topic-number">23</span>
+          <span class="topic-title">JSX elements stored in variables</span>
+          <span class="topic-tag tag-jsx">JSX</span>
+        </div>
+        <div class="topic-body">
+          <p>In JSX you can store entire elements in variables — no quotes needed. Under the hood JSX is just a JavaScript object (<span class="inline-code">React.createElement(...)</span>).</p>
+          <pre><code><span class="kw">const</span> welcomeMsg = <span class="tag-c">&lt;h2&gt;</span>Welcome<span class="tag-c">&lt;/h2&gt;</span>   <span class="cmt">// ✅ JSX element</span>
+<span class="kw">const</span> wrongMsg = <span class="str">"&lt;h2&gt;Welcome&lt;/h2&gt;"</span>  <span class="cmt">// ❌ just a string — renders as text literally</span>
+
+<span class="cmt">// Useful for conditional rendering</span>
+<span class="kw">const</span> content = isLoggedIn ? welcomeMsg : guestMsg
+<span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>{content}<span class="tag-c">&lt;/div&gt;</span></code></pre>
+          <div class="callout">💡 JSX elements are just JavaScript values — store in variables, pass as arguments, return from functions, put in arrays.</div>
+        </div>
+      </div>
+
+      <!-- 24 -->
+      <div class="topic-card" id="t24" data-title="conditional rendering ternary && logical operators if else">
+        <div class="topic-header">
+          <span class="topic-number">24</span>
+          <span class="topic-title">Conditional rendering</span>
+          <span class="topic-tag tag-rendering">Rendering</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">// Ternary — if/else (two cases)</span>
+{isLoggedIn ? <span class="tag-c">&lt;Dashboard /&gt;</span> : <span class="tag-c">&lt;Login /&gt;</span>}
+
+<span class="cmt">// && — if only (one case)</span>
+{isLoggedIn && <span class="tag-c">&lt;Dashboard /&gt;</span>}
+
+<span class="cmt">// ! — reverse a condition</span>
+{!isLoggedIn && <span class="tag-c">&lt;Login /&gt;</span>}
+
+<span class="cmt">// || — fallback value</span>
+{name || <span class="str">"Anonymous"</span>}
+
+<span class="cmt">// ?? — fallback only if null/undefined</span>
+{name ?? <span class="str">"Anonymous"</span>}
+
+<span class="cmt">// Return null to render nothing</span>
+<span class="kw">function</span> <span class="fn">Alert</span>({ show }) {
+  <span class="kw">if</span> (!show) <span class="kw">return null</span>
+  <span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>Alert!<span class="tag-c">&lt;/div&gt;</span>
+}</code></pre>
+          <div class="callout warning">⚠️ <strong>Falsy value gotcha with &&:</strong> if count = 0, then {"{count && <p>...</p>}"} prints 0 on screen instead of nothing. Fix: {"{count > 0 && <p>...</p>}"}</div>
+        </div>
+      </div>
+
+      <!-- 25 -->
+      <div class="topic-card" id="t25" data-title="logical operators AND OR NOT nullish coalescing short circuit">
+        <div class="topic-header">
+          <span class="topic-number">25</span>
+          <span class="topic-title">Logical operators in JSX</span>
+          <span class="topic-tag tag-rendering">Rendering</span>
+        </div>
+        <div class="topic-body">
+          <table>
+            <tr><th>Operator</th><th>Name</th><th>Renders when</th></tr>
+            <tr><td>&amp;&amp;</td><td>Logical AND / short-circuit</td><td>Left side is truthy</td></tr>
+            <tr><td>||</td><td>Logical OR</td><td>Left side is falsy</td></tr>
+            <tr><td>!</td><td>Logical NOT</td><td>Flips the condition</td></tr>
+            <tr><td>??</td><td>Nullish coalescing</td><td>Left side is null/undefined only</td></tr>
+          </table>
+          <p><strong>|| vs ??:</strong></p>
+          <pre><code>{<span class="num">0</span> || <span class="str">"default"</span>}   <span class="cmt">// returns "default" — 0 is falsy</span>
+{<span class="num">0</span> ?? <span class="str">"default"</span>}   <span class="cmt">// returns 0 — 0 is not null/undefined</span></code></pre>
+          <div class="callout">💡 Short-circuit = JavaScript stops evaluating as soon as it knows the result. false &amp;&amp; anything → stops at false, never evaluates the right side.</div>
+        </div>
+      </div>
+
+      <!-- 26 -->
+      <div class="topic-card" id="t26" data-title="rendering lists map array JSX loop">
+        <div class="topic-header">
+          <span class="topic-number">26</span>
+          <span class="topic-title">Rendering lists</span>
+          <span class="topic-tag tag-rendering">Rendering</span>
+        </div>
+        <div class="topic-body">
+          <p>Use <span class="inline-code">.map()</span> to loop over arrays and return JSX — the React way to render lists:</p>
+          <pre><code><span class="kw">const</span> students = [
+  { id: 1, name: <span class="str">"Aman"</span>, age: 22 },
+  { id: 2, name: <span class="str">"Sara"</span>, age: 25 },
+]
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    <span class="tag-c">&lt;ul&gt;</span>
+      {students.<span class="fn">map</span>(student => (
+        <span class="tag-c">&lt;Student</span>
+          <span class="attr">key</span>={student.id}
+          <span class="attr">name</span>={student.name}
+          <span class="attr">age</span>={student.age}
+        <span class="tag-c">/&gt;</span>
+      ))}
+    <span class="tag-c">&lt;/ul&gt;</span>
+  )
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- 27 -->
+      <div class="topic-card" id="t27" data-title="key prop list unique identifier tracking index">
+        <div class="topic-header">
+          <span class="topic-number">27</span>
+          <span class="topic-title">The key prop</span>
+          <span class="topic-tag tag-rendering">Rendering</span>
+        </div>
+        <div class="topic-body">
+          <p>React uses <span class="inline-code">key</span> to track which list items changed, were added, or removed — so it can update only what changed instead of re-rendering the whole list.</p>
+          <pre><code><span class="cmt">// ✅ Best — unique ID from your data</span>
+<span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.id} <span class="tag-c">/&gt;</span>
+
+<span class="cmt">// ✅ Also fine — any unique stable value</span>
+<span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.email} <span class="tag-c">/&gt;</span>
+
+<span class="cmt">// ❌ Avoid — array index causes bugs when list reorders</span>
+{students.<span class="fn">map</span>((student, index) => (
+  <span class="tag-c">&lt;Student</span> <span class="attr">key</span>={index} <span class="tag-c">/&gt;</span>
+))}</code></pre>
+          <p><strong>Key is invisible on the UI</strong> — React strips it before rendering. You can't access it inside the component via props either. If you need the ID inside the component, pass it twice:</p>
+          <pre><code><span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.id} <span class="attr">id</span>={student.id} <span class="tag-c">/&gt;</span></code></pre>
+          <div class="callout">💡 Key must be unique, stable, and not change over time. A database ID is always the best choice.</div>
+        </div>
+      </div>
+
+      <!-- No results message -->
+      <div class="no-results" id="noResults">
+        <div class="emoji">🔍</div>
+        <p>No topics found for "<span id="searchTerm"></span>"</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scroll to top -->
+  <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+    // THEME TOGGLE
+    const themeToggle = document.getElementById('themeToggle')
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light')
+      themeToggle.textContent = isLight ? '🌙 Dark' : '☀️ Light'
+      localStorage.setItem('theme', isLight ? 'light' : 'dark')
+    }
+
+    // Restore saved theme
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light')
+      themeToggle.textContent = '🌙 Dark'
+    } else {
+      themeToggle.textContent = '☀️ Light'
+    }
+
+    // SEARCH
+    const searchInput = document.getElementById('searchInput')
+    const searchCount = document.getElementById('searchCount')
+    const noResults = document.getElementById('noResults')
+    const searchTerm = document.getElementById('searchTerm')
+    const cards = document.querySelectorAll('.topic-card')
+
+    function highlight(text, query) {
+      if (!query) return text
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+      return text.replace(regex, '<mark class="highlight">$1</mark>')
+    }
+
+    searchInput.addEventListener('input', function() {
+      const query = this.value.trim().toLowerCase()
+      let visible = 0
+
+      cards.forEach(card => {
+        const title = card.querySelector('.topic-title')
+        const body = card.querySelector('.topic-body')
+        const dataTitle = card.getAttribute('data-title') || ''
+        const cardText = (title.textContent + ' ' + dataTitle + ' ' + body.textContent).toLowerCase()
+
+        if (!query || cardText.includes(query)) {
+          card.classList.remove('hidden')
+          visible++
+        } else {
+          card.classList.add('hidden')
+        }
+      })
+
+      searchCount.textContent = query ? `${visible} result${visible !== 1 ? 's' : ''}` : ''
+      noResults.style.display = (query && visible === 0) ? 'block' : 'none'
+      searchTerm.textContent = query
+    })
+
+    // SCROLL TO TOP
+    const scrollTopBtn = document.getElementById('scrollTop')
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 400)
+    })
+
+    // SIDEBAR ACTIVE LINK
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id)
+          })
+        }
+      })
+    }, { threshold: 0.3 })
+
+    cards.forEach(card => observer.observe(card))
+  </script>
+</body>
+</html>
