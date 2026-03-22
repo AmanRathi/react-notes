@@ -411,9 +411,306 @@
     body.light .attr { color: #c2410c; }
     body.light .num { color: #b45309; }
 
+    /* =====================
+       RESPONSIVE
+    ===================== */
+
+    /* Tablet (768px–1024px) */
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 200px;
+        min-width: 200px;
+      }
+      .main {
+        padding: 24px 28px;
+      }
+    }
+
+    /* Mobile (≤768px) */
     @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main { padding: 20px; }
+      .header {
+        padding: 16px 16px 12px;
+      }
+
+      .header-top {
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .header-top h1 {
+        font-size: 1.1rem;
+      }
+
+      .subtitle {
+        display: none;
+      }
+
+      .theme-toggle {
+        margin-left: auto;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+      }
+
+      .print-btn {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 16px;
+        max-width: 100%;
+      }
+
+      .topic-card {
+        padding: 18px 16px;
+      }
+
+      .topic-header {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .topic-tag {
+        margin-left: 0;
+      }
+
+      .topic-title {
+        font-size: 1rem;
+      }
+
+      pre {
+        font-size: 0.78rem;
+        padding: 12px;
+      }
+
+      table {
+        font-size: 0.8rem;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .scroll-top {
+        bottom: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+      }
+    }
+
+    /* Small mobile (≤480px) */
+    @media (max-width: 480px) {
+      .header-top h1 {
+        font-size: 1rem;
+      }
+
+      .topic-number {
+        font-size: 0.7rem;
+      }
+
+      .topic-title {
+        font-size: 0.95rem;
+        flex: 1;
+      }
+    }
+
+    /* =====================
+       PRINT BUTTON
+    ===================== */
+    .print-btn {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .print-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* =====================
+       PRINT STYLES
+    ===================== */
+    @media print {
+      /* Force light background for printing */
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 11pt;
+      }
+
+      /* Hide UI chrome */
+      .header .search-wrapper,
+      .theme-toggle,
+      .print-btn,
+      .sidebar,
+      .scroll-top,
+      .no-results {
+        display: none !important;
+      }
+
+      /* Simplify header */
+      .header {
+        position: static !important;
+        background: #ffffff !important;
+        border-bottom: 2px solid #0f172a !important;
+        padding: 12pt 0 8pt !important;
+        margin-bottom: 16pt;
+      }
+
+      .header-top h1 {
+        color: #0f172a !important;
+        font-size: 18pt;
+      }
+
+      .subtitle {
+        display: inline !important;
+        color: #64748b !important;
+      }
+
+      /* Full width content */
+      .container {
+        display: block;
+        max-width: 100%;
+      }
+
+      .main {
+        padding: 0;
+        max-width: 100%;
+      }
+
+      /* Cards */
+      .topic-card {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6pt !important;
+        padding: 12pt !important;
+        margin-bottom: 12pt !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .topic-card.hidden {
+        display: block !important;
+      }
+
+      /* Topic titles */
+      .topic-title {
+        color: #0f172a !important;
+        font-size: 12pt;
+      }
+
+      .topic-number {
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
+      }
+
+      /* Tags — light versions */
+      .tag-setup { background: #dbeafe !important; color: #1d4ed8 !important; }
+      .tag-concepts { background: #dcfce7 !important; color: #15803d !important; }
+      .tag-jsx { background: #f3e8ff !important; color: #7e22ce !important; }
+      .tag-css { background: #ffedd5 !important; color: #c2410c !important; }
+      .tag-props { background: #fce7f3 !important; color: #be185d !important; }
+      .tag-rendering { background: #ccfbf1 !important; color: #0f766e !important; }
+
+      /* Body text */
+      .topic-body {
+        color: #334155 !important;
+      }
+
+      .topic-body strong {
+        color: #0f172a !important;
+      }
+
+      /* Code blocks */
+      pre {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        font-size: 8.5pt !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      code {
+        color: #0f172a !important;
+      }
+
+      .inline-code {
+        background: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+        color: #0284c7 !important;
+      }
+
+      /* Syntax colors for print */
+      .kw { color: #7c3aed !important; }
+      .fn { color: #1d4ed8 !important; }
+      .str { color: #15803d !important; }
+      .cmt { color: #94a3b8 !important; }
+      .tag-c { color: #dc2626 !important; }
+      .attr { color: #c2410c !important; }
+      .num { color: #b45309 !important; }
+
+      /* Callouts */
+      .callout {
+        background: #e0f2fe !important;
+        border-left-color: #0284c7 !important;
+        color: #1e293b !important;
+      }
+
+      .callout.warning {
+        background: #fef3c7 !important;
+        border-left-color: #f59e0b !important;
+      }
+
+      .callout.error {
+        background: #fee2e2 !important;
+        border-left-color: #dc2626 !important;
+      }
+
+      /* Tables */
+      th {
+        background: #f1f5f9 !important;
+        color: #0284c7 !important;
+        border-bottom-color: #cbd5e1 !important;
+      }
+
+      td {
+        color: #334155 !important;
+        border-bottom-color: #e2e8f0 !important;
+      }
+
+      /* Page settings */
+      @page {
+        margin: 1.5cm 1.8cm;
+        size: A4;
+      }
+
+      /* Page title on first page */
+      .header-top::after {
+        content: " — React Learning Notes";
+        color: #64748b;
+        font-size: 10pt;
+      }
     }
   </style>
 </head>
@@ -426,6 +723,7 @@
       <h1>Aman's React Notes</h1>
       <span class="subtitle">Updated as you learn</span>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+      <button class="print-btn" onclick="window.print()">🖨️ Print</button>
     </div>
     <div class="search-wrapper">
       <span class="search-icon">🔍</span>
