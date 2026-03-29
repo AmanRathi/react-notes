@@ -764,6 +764,7 @@
       <a class="sidebar-link" href="#t25">Logical operators in JSX</a>
       <a class="sidebar-link" href="#t26">Rendering lists</a>
       <a class="sidebar-link" href="#t27">The key prop</a>
+      <a class="sidebar-link" href="#t28">Destructuring & passing data</a>
     </div>
 
     <!-- MAIN -->
@@ -1407,6 +1408,71 @@ Student.defaultProps = {
           <p><strong>Key is invisible on the UI</strong> — React strips it before rendering. You can't access it inside the component via props either. If you need the ID inside the component, pass it twice:</p>
           <pre><code><span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.id} <span class="attr">id</span>={student.id} <span class="tag-c">/&gt;</span></code></pre>
           <div class="callout">💡 Key must be unique, stable, and not change over time. A database ID is always the best choice.</div>
+        </div>
+      </div>
+
+      <!-- 28 -->
+      <div class="topic-card" id="t28" data-title="destructuring props passing data component items students exact name match">
+        <div class="topic-header">
+          <span class="topic-number">28</span>
+          <span class="topic-title">Destructuring props & passing data to components</span>
+          <span class="topic-tag tag-props">Props</span>
+        </div>
+        <div class="topic-body">
+          <p>The destructured name <strong>must exactly match</strong> the prop name you pass in JSX — same spelling, same case.</p>
+          <pre><code><span class="cmt">// App.jsx — passing data as a prop called "items"</span>
+<span class="kw">const</span> students = [
+  { name: <span class="str">"Aman"</span>, age: <span class="num">22</span>, interest: <span class="str">"Design"</span>, email: <span class="str">"aman@example"</span> },
+  { name: <span class="str">"Kanak"</span>, age: <span class="num">23</span>, interest: <span class="str">"Art"</span>, email: <span class="str">"kanak@example"</span> },
+]
+
+<span class="kw">return</span> <span class="tag-c">&lt;Student</span> <span class="attr">items</span>={students} <span class="tag-c">/&gt;</span>
+<span class="cmt">//              ^^^^^ prop name is "items"</span></code></pre>
+
+          <pre><code><span class="cmt">// Student.jsx — destructuring must match "items" exactly</span>
+<span class="kw">function</span> <span class="fn">Student</span>({ items }) {       <span class="cmt">// ✅ matches "items"</span>
+  <span class="kw">const</span> studentList = items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
+    <span class="kw">return</span> (
+      <span class="tag-c">&lt;div</span> <span class="attr">key</span>={item.email} <span class="attr">className</span>={styles.card}<span class="tag-c">&gt;</span>
+        <span class="tag-c">&lt;p&gt;</span>Name: {item.name}<span class="tag-c">&lt;/p&gt;</span>
+        <span class="tag-c">&lt;p&gt;</span>Age: {item.age}<span class="tag-c">&lt;/p&gt;</span>
+        <span class="tag-c">&lt;p&gt;</span>Interest: {item.interest}<span class="tag-c">&lt;/p&gt;</span>
+        <span class="tag-c">&lt;p&gt;</span>Email: {item.email}<span class="tag-c">&lt;/p&gt;</span>
+      <span class="tag-c">&lt;/div&gt;</span>
+    );
+  });
+  <span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>{studentList}<span class="tag-c">&lt;/div&gt;</span>;
+}
+
+<span class="cmt">// ❌ Wrong names — these won't work:</span>
+<span class="kw">function</span> <span class="fn">Student</span>({ students }) {}  <span class="cmt">// looks for prop named "students"</span>
+<span class="kw">function</span> <span class="fn">Student</span>({ data }) {}      <span class="cmt">// looks for prop named "data"</span>
+<span class="kw">function</span> <span class="fn">Student</span>({ props }) {}     <span class="cmt">// looks for prop literally named "props"</span></code></pre>
+
+          <p><strong>Alternatively — use the whole props object (no destructuring):</strong></p>
+          <pre><code><span class="kw">function</span> <span class="fn">Student</span>(props) {
+  <span class="kw">const</span> studentList = props.items.<span class="fn">map</span>(...)  <span class="cmt">// access via props.propName</span>
+}</code></pre>
+
+          <p><strong>Common mistakes found in this pattern:</strong></p>
+          <pre><code><span class="cmt">// ❌ Mistake 1 — .map() on props object itself</span>
+<span class="kw">const</span> list = props.<span class="fn">map</span>(...)        <span class="cmt">// props is an object, not an array!</span>
+
+<span class="cmt">// ❌ Mistake 2 — missing return inside .map()</span>
+items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
+  <span class="tag-c">&lt;div&gt;</span>...<span class="tag-c">&lt;/div&gt;</span>                  <span class="cmt">// floating JSX — never returned</span>
+})
+
+<span class="cmt">// ❌ Mistake 3 — returning a JS object instead of JSX</span>
+<span class="kw">return</span> { studentList }             <span class="cmt">// {} = JS object, not JSX!</span>
+
+<span class="cmt">// ✅ All fixed</span>
+items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
+  <span class="kw">return</span> <span class="tag-c">&lt;div</span> <span class="attr">key</span>={item.email}<span class="tag-c">&gt;</span>...<span class="tag-c">&lt;/div&gt;</span>
+})
+<span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>{studentList}<span class="tag-c">&lt;/div&gt;</span></code></pre>
+
+          <div class="callout">💡 The full pattern: <strong>define data in App.jsx → pass as named prop → destructure with exact same name → .map() over it → return JSX</strong>. This is the most common pattern in all of React.</div>
         </div>
       </div>
 
