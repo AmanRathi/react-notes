@@ -764,7 +764,21 @@
       <a class="sidebar-link" href="#t25">Logical operators in JSX</a>
       <a class="sidebar-link" href="#t26">Rendering lists</a>
       <a class="sidebar-link" href="#t27">The key prop</a>
-      <a class="sidebar-link" href="#t28">Destructuring & passing data</a>
+      <a class="sidebar-link" href="#t28">Props name mismatch</a>
+      <a class="sidebar-link" href="#t29">Arrow fn: {} vs ()</a>
+      <a class="sidebar-link" href="#t30">.map() mistakes</a>
+      <a class="sidebar-link" href="#t31">JSX single root element</a>
+      <a class="sidebar-link" href="#t32">npx — on-demand runner</a>
+      <a class="sidebar-link" href="#t33">What comes with Node.js</a>
+      <a class="sidebar-link" href="#t34">npx serve vs npm run dev</a>
+      <a class="sidebar-link" href="#t35">Click events</a>
+      <a class="sidebar-link" href="#t36">The event object</a>
+      <a class="sidebar-link" href="#t37">What are Hooks?</a>
+      <a class="sidebar-link" href="#t38">useState</a>
+      <a class="sidebar-link" href="#t39">Spread operator</a>
+      <a class="sidebar-link" href="#t40">Mutation</a>
+      <a class="sidebar-link" href="#t41">Memory &amp; garbage collection</a>
+      <a class="sidebar-link" href="#t42">Spread override pattern</a>
     </div>
 
     <!-- MAIN -->
@@ -1412,67 +1426,502 @@ Student.defaultProps = {
       </div>
 
       <!-- 28 -->
-      <div class="topic-card" id="t28" data-title="destructuring props passing data component items students exact name match">
+      <div class="topic-card" id="t28" data-title="props name mismatch caller destructuring match">
         <div class="topic-header">
           <span class="topic-number">28</span>
-          <span class="topic-title">Destructuring props & passing data to components</span>
+          <span class="topic-title">Props — name must match</span>
           <span class="topic-tag tag-props">Props</span>
         </div>
         <div class="topic-body">
-          <p>The destructured name <strong>must exactly match</strong> the prop name you pass in JSX — same spelling, same case.</p>
-          <pre><code><span class="cmt">// App.jsx — passing data as a prop called "items"</span>
-<span class="kw">const</span> students = [
-  { name: <span class="str">"Aman"</span>, age: <span class="num">22</span>, interest: <span class="str">"Design"</span>, email: <span class="str">"aman@example"</span> },
-  { name: <span class="str">"Kanak"</span>, age: <span class="num">23</span>, interest: <span class="str">"Art"</span>, email: <span class="str">"kanak@example"</span> },
-]
+          <p>The prop name you pass in the caller <strong>must match</strong> the name you destructure inside the component. Props are key-value pairs, not positional arguments.</p>
+          <pre><code><span class="cmt">// Calling the component</span>
+<span class="tag-c">&lt;Collegestudents</span> <span class="attr">item</span>={collegeStudents} <span class="tag-c">/&gt;</span>
 
-<span class="kw">return</span> <span class="tag-c">&lt;Student</span> <span class="attr">items</span>={students} <span class="tag-c">/&gt;</span>
-<span class="cmt">//              ^^^^^ prop name is "items"</span></code></pre>
-
-          <pre><code><span class="cmt">// Student.jsx — destructuring must match "items" exactly</span>
-<span class="kw">function</span> <span class="fn">Student</span>({ items }) {       <span class="cmt">// ✅ matches "items"</span>
-  <span class="kw">const</span> studentList = items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
-    <span class="kw">return</span> (
-      <span class="tag-c">&lt;div</span> <span class="attr">key</span>={item.email} <span class="attr">className</span>={styles.card}<span class="tag-c">&gt;</span>
-        <span class="tag-c">&lt;p&gt;</span>Name: {item.name}<span class="tag-c">&lt;/p&gt;</span>
-        <span class="tag-c">&lt;p&gt;</span>Age: {item.age}<span class="tag-c">&lt;/p&gt;</span>
-        <span class="tag-c">&lt;p&gt;</span>Interest: {item.interest}<span class="tag-c">&lt;/p&gt;</span>
-        <span class="tag-c">&lt;p&gt;</span>Email: {item.email}<span class="tag-c">&lt;/p&gt;</span>
-      <span class="tag-c">&lt;/div&gt;</span>
-    );
-  });
-  <span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>{studentList}<span class="tag-c">&lt;/div&gt;</span>;
+<span class="cmt">// ❌ Wrong — destructuring "collegeStudents" but prop is named "item"</span>
+<span class="kw">function</span> <span class="fn">Collegestudents</span>({ collegeStudents }) {
+  collegeStudents.<span class="fn">map</span>(...)   <span class="cmt">// undefined — prop doesn't exist under this name</span>
 }
 
-<span class="cmt">// ❌ Wrong names — these won't work:</span>
-<span class="kw">function</span> <span class="fn">Student</span>({ students }) {}  <span class="cmt">// looks for prop named "students"</span>
-<span class="kw">function</span> <span class="fn">Student</span>({ data }) {}      <span class="cmt">// looks for prop named "data"</span>
-<span class="kw">function</span> <span class="fn">Student</span>({ props }) {}     <span class="cmt">// looks for prop literally named "props"</span></code></pre>
-
-          <p><strong>Alternatively — use the whole props object (no destructuring):</strong></p>
-          <pre><code><span class="kw">function</span> <span class="fn">Student</span>(props) {
-  <span class="kw">const</span> studentList = props.items.<span class="fn">map</span>(...)  <span class="cmt">// access via props.propName</span>
+<span class="cmt">// ✅ Correct — destructuring matches the prop name "item"</span>
+<span class="kw">function</span> <span class="fn">Collegestudents</span>({ item }) {
+  item.<span class="fn">map</span>(...)   <span class="cmt">// works</span>
 }</code></pre>
+          <div class="callout">💡 Rule: whatever name appears in <span class="inline-code">&lt;Component propName={value} /&gt;</span> is the key you destructure with <span class="inline-code">{ propName }</span> inside the component.</div>
+        </div>
+      </div>
 
-          <p><strong>Common mistakes found in this pattern:</strong></p>
-          <pre><code><span class="cmt">// ❌ Mistake 1 — .map() on props object itself</span>
-<span class="kw">const</span> list = props.<span class="fn">map</span>(...)        <span class="cmt">// props is an object, not an array!</span>
-
-<span class="cmt">// ❌ Mistake 2 — missing return inside .map()</span>
-items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
-  <span class="tag-c">&lt;div&gt;</span>...<span class="tag-c">&lt;/div&gt;</span>                  <span class="cmt">// floating JSX — never returned</span>
+      <!-- 29 -->
+      <div class="topic-card" id="t29" data-title="arrow function body curly braces parentheses implicit explicit return">
+        <div class="topic-header">
+          <span class="topic-number">29</span>
+          <span class="topic-title">Arrow function: {} vs () body</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>Arrow functions have two body styles. The braces you use decide whether you need an explicit <span class="inline-code">return</span>:</p>
+          <pre><code><span class="cmt">// {} — block body, must use explicit return</span>
+students.<span class="fn">map</span>(student => {
+  <span class="kw">return</span> <span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.id} <span class="tag-c">/&gt;</span>
 })
 
-<span class="cmt">// ❌ Mistake 3 — returning a JS object instead of JSX</span>
-<span class="kw">return</span> { studentList }             <span class="cmt">// {} = JS object, not JSX!</span>
+<span class="cmt">// () — expression body, implicit return (no return keyword needed)</span>
+students.<span class="fn">map</span>(student => (
+  <span class="tag-c">&lt;Student</span> <span class="attr">key</span>={student.id} <span class="tag-c">/&gt;</span>
+))
 
-<span class="cmt">// ✅ All fixed</span>
-items.<span class="fn">map</span>(<span class="kw">function</span>(item) {
-  <span class="kw">return</span> <span class="tag-c">&lt;div</span> <span class="attr">key</span>={item.email}<span class="tag-c">&gt;</span>...<span class="tag-c">&lt;/div&gt;</span>
+<span class="cmt">// Single-line — no parens needed at all</span>
+<span class="kw">const</span> <span class="fn">double</span> = n => n * <span class="num">2</span></code></pre>
+          <p>The <span class="inline-code">()</span> are not function syntax — they are just a grouping operator that lets multiline JSX stay readable.</p>
+          <table>
+            <tr><th></th><th>Regular function</th><th>Arrow function</th></tr>
+            <tr><td>{} body + return</td><td>✅ only option</td><td>✅ works</td></tr>
+            <tr><td>() implicit return</td><td>❌ not available</td><td>✅ works</td></tr>
+          </table>
+          <div class="callout warning">⚠️ Implicit return with () is arrow function only. Regular functions always need {} and an explicit return.</div>
+        </div>
+      </div>
+
+      <!-- 30 -->
+      <div class="topic-card" id="t30" data-title="map common mistakes not returning JSX result unused undefined callback">
+        <div class="topic-header">
+          <span class="topic-number">30</span>
+          <span class="topic-title">.map() — common mistakes</span>
+          <span class="topic-tag tag-rendering">Rendering</span>
+        </div>
+        <div class="topic-body">
+          <p>Three mistakes that make <span class="inline-code">.map()</span> silently produce nothing:</p>
+          <pre><code><span class="cmt">// ❌ Mistake 1 — {} body with no return, every item is undefined</span>
+students.<span class="fn">map</span>(student => {
+  <span class="tag-c">&lt;li&gt;</span>{student.name}<span class="tag-c">&lt;/li&gt;</span>   <span class="cmt">// forgot return</span>
 })
-<span class="kw">return</span> <span class="tag-c">&lt;div&gt;</span>{studentList}<span class="tag-c">&lt;/div&gt;</span></code></pre>
 
-          <div class="callout">💡 The full pattern: <strong>define data in App.jsx → pass as named prop → destructure with exact same name → .map() over it → return JSX</strong>. This is the most common pattern in all of React.</div>
+<span class="cmt">// ❌ Mistake 2 — result stored but never used in JSX</span>
+<span class="kw">const</span> list = students.<span class="fn">map</span>(student => <span class="tag-c">&lt;li&gt;</span>{student.name}<span class="tag-c">&lt;/li&gt;</span>)
+<span class="kw">return</span> <span class="tag-c">&lt;ul&gt;&lt;li&gt;</span>hardcoded<span class="tag-c">&lt;/li&gt;&lt;/ul&gt;</span>   <span class="cmt">// list is thrown away</span>
+
+<span class="cmt">// ❌ Mistake 3 — using an undefined variable inside the callback</span>
+<span class="kw">const</span> x = <span class="tag-c">&lt;h1&gt;</span>{heading}<span class="tag-c">&lt;/h1&gt;</span>   <span class="cmt">// heading was never defined → ReferenceError</span>
+
+<span class="cmt">// ✅ Correct</span>
+<span class="kw">return</span> (
+  <span class="tag-c">&lt;ul&gt;</span>
+    {students.<span class="fn">map</span>(student => (
+      <span class="tag-c">&lt;li</span> <span class="attr">key</span>={student.id}<span class="tag-c">&gt;</span>{student.name}<span class="tag-c">&lt;/li&gt;</span>
+    ))}
+  <span class="tag-c">&lt;/ul&gt;</span>
+)</code></pre>
+        </div>
+      </div>
+
+      <!-- 31 -->
+      <div class="topic-card" id="t31" data-title="JSX single root element multiple siblings fragment error">
+        <div class="topic-header">
+          <span class="topic-number">31</span>
+          <span class="topic-title">JSX must have one root element</span>
+          <span class="topic-tag tag-jsx">JSX</span>
+        </div>
+        <div class="topic-body">
+          <p>Every JSX <span class="inline-code">return</span> must have exactly one root element — including inside <span class="inline-code">.map()</span> callbacks. Multiple siblings at the top level is a syntax error.</p>
+          <pre><code><span class="cmt">// ❌ Error — three root &lt;li&gt; elements</span>
+<span class="kw">return</span> (
+  <span class="tag-c">&lt;li&gt;</span>item one<span class="tag-c">&lt;/li&gt;</span>
+  <span class="tag-c">&lt;li&gt;</span>item two<span class="tag-c">&lt;/li&gt;</span>
+  <span class="tag-c">&lt;li&gt;</span>item three<span class="tag-c">&lt;/li&gt;</span>
+)
+
+<span class="cmt">// ✅ Fix — wrap in Fragment (adds no extra HTML)</span>
+<span class="kw">return</span> (
+  <span class="tag-c">&lt;&gt;</span>
+    <span class="tag-c">&lt;li&gt;</span>item one<span class="tag-c">&lt;/li&gt;</span>
+    <span class="tag-c">&lt;li&gt;</span>item two<span class="tag-c">&lt;/li&gt;</span>
+    <span class="tag-c">&lt;li&gt;</span>item three<span class="tag-c">&lt;/li&gt;</span>
+  <span class="tag-c">&lt;/&gt;</span>
+)</code></pre>
+          <div class="callout">💡 Same rule applies inside .map() — if each item needs multiple elements, wrap in <span class="inline-code">&lt;&gt;&lt;/&gt;</span>. Use a <span class="inline-code">&lt;div&gt;</span> only when you actually want the extra HTML element.</div>
+        </div>
+      </div>
+
+      <!-- 32 -->
+      <div class="topic-card" id="t32" data-title="npx on demand package runner without installing temporary npm">
+        <div class="topic-header">
+          <span class="topic-number">32</span>
+          <span class="topic-title">npx — on-demand package runner</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p><span class="inline-code">npx</span> downloads and runs a package on the fly — without installing it permanently. Nothing gets added to your <span class="inline-code">package.json</span> or <span class="inline-code">node_modules</span>.</p>
+          <pre><code><span class="cmt"># npm install — permanent, stays in node_modules</span>
+npm install serve
+
+<span class="cmt"># npx — download, run, then discard</span>
+npx serve .
+
+<span class="cmt"># You've already used npx without realising</span>
+npm create vite@latest   <span class="cmt">// this is npx create-vite@latest under the hood</span></code></pre>
+          <div class="callout">💡 npx is bundled with Node.js — you never install it separately. Same with npm and corepack.</div>
+        </div>
+      </div>
+
+      <!-- 33 -->
+      <div class="topic-card" id="t33" data-title="node npm npx corepack bundled nodejs install what comes with">
+        <div class="topic-header">
+          <span class="topic-number">33</span>
+          <span class="topic-title">What comes bundled with Node.js</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p>When you install Node.js, you automatically get four CLI tools — nothing else:</p>
+          <table>
+            <tr><th>Tool</th><th>What it is</th></tr>
+            <tr><td>node</td><td>The runtime — executes JavaScript outside the browser</td></tr>
+            <tr><td>npm</td><td>Package manager — install and manage packages</td></tr>
+            <tr><td>npx</td><td>Package runner — run packages without installing them</td></tr>
+            <tr><td>corepack</td><td>Manages other package managers (yarn, pnpm) — ships since Node v16</td></tr>
+          </table>
+          <div class="callout">💡 Everything else — vite, react, serve, etc. — you install separately via <span class="inline-code">npm install</span>.</div>
+        </div>
+      </div>
+
+      <!-- 34 -->
+      <div class="topic-card" id="t34" data-title="npx serve npm run dev static file server vite difference HMR JSX">
+        <div class="topic-header">
+          <span class="topic-number">34</span>
+          <span class="topic-title">npx serve vs npm run dev</span>
+          <span class="topic-tag tag-setup">Setup</span>
+        </div>
+        <div class="topic-body">
+          <p>They look similar but do completely different things:</p>
+          <table>
+            <tr><th></th><th>npx serve</th><th>npm run dev (Vite)</th></tr>
+            <tr><td>What it serves</td><td>Raw files as-is</td><td>Transpiled / bundled code</td></tr>
+            <tr><td>Understands JSX</td><td>❌ No</td><td>✅ Yes</td></tr>
+            <tr><td>HMR (live reload)</td><td>❌ No</td><td>✅ Yes</td></tr>
+            <tr><td>Needs package.json</td><td>❌ No</td><td>✅ Yes</td></tr>
+            <tr><td>Use case</td><td>Plain HTML / CSS / JS</td><td>React, Vue, any framework</td></tr>
+          </table>
+          <div class="callout">💡 For a plain HTML file use <span class="inline-code">npx serve</span>. For a React project made with Vite, use <span class="inline-code">npm run dev</span>.</div>
+        </div>
+      </div>
+
+      <!-- 35 -->
+      <div class="topic-card" id="t35" data-title="click events onClick handler scalable patterns arguments event">
+        <div class="topic-header">
+          <span class="topic-number">35</span>
+          <span class="topic-title">Click events — patterns &amp; rules</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="kw">function</span> <span class="fn">StudentList</span>({ students }) {
+
+  <span class="cmt">// ✅ Named handler — logic lives outside JSX</span>
+  <span class="kw">function</span> <span class="fn">handleRemove</span>(id) {
+    console.<span class="fn">log</span>(<span class="str">"remove id:"</span>, id)
+  }
+
+  <span class="kw">function</span> <span class="fn">handleRowClick</span>(student) {
+    console.<span class="fn">log</span>(<span class="str">"clicked:"</span>, student.name)
+  }
+
+  <span class="kw">function</span> <span class="fn">handleRemoveClick</span>(e, id) {
+    e.<span class="fn">stopPropagation</span>()   <span class="cmt">// stop row click from also firing</span>
+    <span class="fn">handleRemove</span>(id)
+  }
+
+  <span class="kw">return</span> (
+    <span class="tag-c">&lt;ul&gt;</span>
+      {students.<span class="fn">map</span>(student => (
+        <span class="tag-c">&lt;li</span> <span class="attr">key</span>={student.id} <span class="attr">onClick</span>={() => <span class="fn">handleRowClick</span>(student)}<span class="tag-c">&gt;</span>
+          {student.name}
+          <span class="tag-c">&lt;button</span> <span class="attr">onClick</span>={e => <span class="fn">handleRemoveClick</span>(e, student.id)}<span class="tag-c">&gt;</span>
+            Remove
+          <span class="tag-c">&lt;/button&gt;</span>
+        <span class="tag-c">&lt;/li&gt;</span>
+      ))}
+    <span class="tag-c">&lt;/ul&gt;</span>
+  )
+}</code></pre>
+          <p><strong>The three rules:</strong></p>
+          <table>
+            <tr><th>Pattern</th><th>When to use</th></tr>
+            <tr><td><span class="inline-code">onClick={handler}</span></td><td>No arguments needed — pass directly</td></tr>
+            <tr><td><span class="inline-code">onClick={() =&gt; handler(arg)}</span></td><td>Need to pass data (id, item, etc.)</td></tr>
+            <tr><td><span class="inline-code">onClick={(e) =&gt; handler(e, arg)}</span></td><td>Need event object + data</td></tr>
+          </table>
+          <div class="callout error">❌ <strong>onClick={handleRemove()}</strong> — calls immediately on render, not on click. Always pass a reference, never call it.</div>
+          <div class="callout warning">⚠️ Keep logic in named functions, not inline. <span class="inline-code">onClick={() =&gt; { doThis(); doThat(); }}</span> gets messy fast — hard to read, hard to reuse.</div>
+        </div>
+      </div>
+
+      <!-- 36 -->
+      <div class="topic-card" id="t36" data-title="event object e target value preventDefault stopPropagation key clientX">
+        <div class="topic-header">
+          <span class="topic-number">36</span>
+          <span class="topic-title">The event object</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>The browser automatically passes an event object (<span class="inline-code">e</span>) to every handler. It contains info about what just happened:</p>
+          <pre><code><span class="kw">function</span> <span class="fn">handleClick</span>(e) {
+  e.target              <span class="cmt">// the exact element clicked</span>
+  e.target.value        <span class="cmt">// value of an input/select</span>
+  e.target.name         <span class="cmt">// name attribute of the element</span>
+
+  e.clientX / e.clientY <span class="cmt">// mouse position in viewport</span>
+
+  e.key                 <span class="cmt">// "Enter", "Escape", "a" etc. (keyboard events)</span>
+  e.shiftKey / e.ctrlKey / e.altKey  <span class="cmt">// modifier keys — true/false</span>
+
+  e.<span class="fn">preventDefault</span>()    <span class="cmt">// stop browser's default behaviour</span>
+  e.<span class="fn">stopPropagation</span>()   <span class="cmt">// stop event bubbling up to parent</span>
+}</code></pre>
+          <p><strong>When each is actually useful:</strong></p>
+          <pre><code><span class="cmt">// 1. Reading input value</span>
+<span class="tag-c">&lt;input</span> <span class="attr">onChange</span>={e => console.<span class="fn">log</span>(e.target.value)} <span class="tag-c">/&gt;</span>
+
+<span class="cmt">// 2. Stop form from reloading the page</span>
+<span class="kw">function</span> <span class="fn">handleSubmit</span>(e) {
+  e.<span class="fn">preventDefault</span>()
+}
+<span class="tag-c">&lt;form</span> <span class="attr">onSubmit</span>={handleSubmit}<span class="tag-c">&gt;</span>...<span class="tag-c">&lt;/form&gt;</span>
+
+<span class="cmt">// 3. Keyboard shortcuts</span>
+<span class="kw">function</span> <span class="fn">handleKeyDown</span>(e) {
+  <span class="kw">if</span> (e.key === <span class="str">"Enter"</span>) <span class="fn">submitForm</span>()
+  <span class="kw">if</span> (e.key === <span class="str">"Escape"</span>) <span class="fn">closeModal</span>()
+}
+
+<span class="cmt">// 4. One handler for multiple inputs</span>
+<span class="kw">function</span> <span class="fn">handleChange</span>(e) {
+  console.<span class="fn">log</span>(e.target.name, e.target.value)  <span class="cmt">// "email", "password" etc.</span>
+}
+<span class="tag-c">&lt;input</span> <span class="attr">name</span>=<span class="str">"email"</span>    <span class="attr">onChange</span>={handleChange} <span class="tag-c">/&gt;</span>
+<span class="tag-c">&lt;input</span> <span class="attr">name</span>=<span class="str">"password"</span> <span class="attr">onChange</span>={handleChange} <span class="tag-c">/&gt;</span></code></pre>
+          <table>
+            <tr><th>Property / Method</th><th>Most useful for</th></tr>
+            <tr><td>e.target.value</td><td>Reading input fields</td></tr>
+            <tr><td>e.target.name</td><td>One handler for multiple inputs</td></tr>
+            <tr><td>e.preventDefault()</td><td>Stop form reload, stop link navigation</td></tr>
+            <tr><td>e.stopPropagation()</td><td>Stop click bubbling to parent</td></tr>
+            <tr><td>e.key</td><td>Keyboard shortcuts</td></tr>
+            <tr><td>e.clientX/Y</td><td>Mouse position, drag, tooltips</td></tr>
+          </table>
+          <div class="callout">💡 Most of the time you only need <span class="inline-code">e.target.value</span> or <span class="inline-code">e.preventDefault()</span>. The rest come up as your UIs get more complex.</div>
+        </div>
+      </div>
+
+      <!-- 37 -->
+      <div class="topic-card" id="t37" data-title="hooks what are hooks why needed useState useEffect vanilla js">
+        <div class="topic-header">
+          <span class="topic-number">37</span>
+          <span class="topic-title">What are Hooks?</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>Hooks are special React functions that let your component <strong>remember things</strong> and <strong>react to changes</strong>. They always start with <span class="inline-code">use</span>.</p>
+          <p>Without hooks, function components were "dumb" — every re-render forgot everything:</p>
+          <pre><code><span class="cmt">// ❌ Without state — clicks do nothing, UI never updates</span>
+<span class="kw">function</span> <span class="fn">Counter</span>() {
+  <span class="kw">let</span> count = <span class="num">0</span>
+  <span class="kw">function</span> <span class="fn">handleClick</span>() {
+    count = count + <span class="num">1</span>   <span class="cmt">// updates the variable...</span>
+                        <span class="cmt">// ...but React doesn't know, so no re-render</span>
+  }
+  <span class="kw">return</span> <span class="tag-c">&lt;button</span> <span class="attr">onClick</span>={handleClick}<span class="tag-c">&gt;</span>{count}<span class="tag-c">&lt;/button&gt;</span>
+}
+
+<span class="cmt">// ✅ With useState — React knows, re-renders automatically</span>
+<span class="kw">function</span> <span class="fn">Counter</span>() {
+  <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(<span class="num">0</span>)
+  <span class="kw">function</span> <span class="fn">handleClick</span>() {
+    <span class="fn">setCount</span>(count + <span class="num">1</span>)   <span class="cmt">// tells React "re-render now"</span>
+  }
+  <span class="kw">return</span> <span class="tag-c">&lt;button</span> <span class="attr">onClick</span>={handleClick}<span class="tag-c">&gt;</span>{count}<span class="tag-c">&lt;/button&gt;</span>
+}</code></pre>
+          <p>Hooks are <strong>100% a React invention</strong> — they don't exist in vanilla JS. In vanilla JS you manually update the DOM yourself. In React you update state, and React figures out what to update.</p>
+          <table>
+            <tr><th>Hook</th><th>What it does</th></tr>
+            <tr><td>useState</td><td>Remember and update values</td></tr>
+            <tr><td>useEffect</td><td>Run code when something changes (API calls, timers)</td></tr>
+            <tr><td>useRef</td><td>Reference a DOM element directly</td></tr>
+            <tr><td>useContext</td><td>Share data across components without passing props</td></tr>
+          </table>
+          <div class="callout">💡 useState does two things a regular variable can't: persists the value across re-renders, and triggers a re-render when the value changes.</div>
+        </div>
+      </div>
+
+      <!-- 38 -->
+      <div class="topic-card" id="t38" data-title="useState hook syntax data types objects arrays common patterns form toggle list">
+        <div class="topic-header">
+          <span class="topic-number">38</span>
+          <span class="topic-title">useState</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <pre><code><span class="cmt">// Syntax</span>
+<span class="kw">const</span> [value, setValue] = <span class="fn">useState</span>(initialValue)
+<span class="cmt">//     ↑ read    ↑ update              ↑ starting value (first render only)</span></code></pre>
+          <p>Works with every data type:</p>
+          <pre><code><span class="kw">const</span> [count, setCount]       = <span class="fn">useState</span>(<span class="num">0</span>)
+<span class="kw">const</span> [name, setName]         = <span class="fn">useState</span>(<span class="str">""</span>)
+<span class="kw">const</span> [isOpen, setIsOpen]     = <span class="fn">useState</span>(<span class="kw">false</span>)
+<span class="kw">const</span> [students, setStudents] = <span class="fn">useState</span>([])
+<span class="kw">const</span> [user, setUser]         = <span class="fn">useState</span>({ name: <span class="str">""</span>, age: <span class="num">0</span> })
+<span class="kw">const</span> [data, setData]         = <span class="fn">useState</span>(<span class="kw">null</span>)</code></pre>
+          <p><strong>Common patterns:</strong></p>
+          <pre><code><span class="cmt">// Toggle (boolean)</span>
+<span class="fn">setIsOpen</span>(prev => !prev)
+
+<span class="cmt">// Form fields — one handler for all inputs</span>
+<span class="kw">const</span> [form, setForm] = <span class="fn">useState</span>({ name: <span class="str">""</span>, email: <span class="str">""</span> })
+<span class="kw">function</span> <span class="fn">handleChange</span>(e) {
+  <span class="fn">setForm</span>({ ...form, [e.target.name]: e.target.value })
+}
+
+<span class="cmt">// List operations</span>
+<span class="kw">const</span> add    = item => <span class="fn">setItems</span>([...items, item])
+<span class="kw">const</span> remove = id   => <span class="fn">setItems</span>(items.<span class="fn">filter</span>(i => i.id !== id))
+<span class="kw">const</span> update = (id, val) => <span class="fn">setItems</span>(
+  items.<span class="fn">map</span>(i => i.id === id ? { ...i, ...val } : i)
+)
+
+<span class="cmt">// Loading / error state</span>
+<span class="kw">const</span> [data, setData]       = <span class="fn">useState</span>(<span class="kw">null</span>)
+<span class="kw">const</span> [loading, setLoading] = <span class="fn">useState</span>(<span class="kw">false</span>)
+<span class="kw">const</span> [error, setError]     = <span class="fn">useState</span>(<span class="kw">null</span>)</code></pre>
+          <table>
+            <tr><th>Data type</th><th>Initial value</th><th>Update method</th></tr>
+            <tr><td>Number</td><td>useState(0)</td><td>setValue(n + 1)</td></tr>
+            <tr><td>String</td><td>useState("")</td><td>setValue("new")</td></tr>
+            <tr><td>Boolean</td><td>useState(false)</td><td>setValue(prev =&gt; !prev)</td></tr>
+            <tr><td>Array</td><td>useState([])</td><td>spread: [...arr, newItem]</td></tr>
+            <tr><td>Object</td><td>useState({})</td><td>spread: { ...obj, key: val }</td></tr>
+            <tr><td>Null</td><td>useState(null)</td><td>setValue(data)</td></tr>
+          </table>
+          <div class="callout warning">⚠️ Objects and arrays — never mutate directly. Always create a new one with spread. React uses === to detect changes — same reference = no re-render.</div>
+        </div>
+      </div>
+
+      <!-- 39 -->
+      <div class="topic-card" id="t39" data-title="spread operator shallow copy reference value objects arrays">
+        <div class="topic-header">
+          <span class="topic-number">39</span>
+          <span class="topic-title">Spread operator <code>...</code></span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>Primitives (numbers, strings) are copied by value — safe with <span class="inline-code">=</span>. Objects and arrays are stored by reference — copying with <span class="inline-code">=</span> gives you the same object in memory, not a copy.</p>
+          <pre><code><span class="cmt">// Primitive — safe, copied by value</span>
+<span class="kw">let</span> a = <span class="num">5</span>
+<span class="kw">let</span> b = a
+b = <span class="num">10</span>
+console.<span class="fn">log</span>(a)   <span class="cmt">// still 5</span>
+
+<span class="cmt">// Object — dangerous, copied by reference</span>
+<span class="kw">let</span> user  = { name: <span class="str">"Aman"</span>, age: <span class="num">22</span> }
+<span class="kw">let</span> user2 = user         <span class="cmt">// same object in memory</span>
+user2.age = <span class="num">99</span>
+console.<span class="fn">log</span>(user.age)  <span class="cmt">// 99 — original mutated!</span>
+
+<span class="cmt">// Spread — creates a new object, original untouched</span>
+<span class="kw">let</span> user2 = { ...user }
+user2.age = <span class="num">99</span>
+console.<span class="fn">log</span>(user.age)  <span class="cmt">// still 22</span></code></pre>
+          <p><strong>Spread is shallow</strong> — only one level deep. Nested objects are still shared:</p>
+          <pre><code><span class="kw">let</span> user = { name: <span class="str">"Aman"</span>, address: { city: <span class="str">"Delhi"</span> } }
+<span class="kw">let</span> user2 = { ...user }
+user2.address.city = <span class="str">"Mumbai"</span>
+console.<span class="fn">log</span>(user.address.city)  <span class="cmt">// "Mumbai" — nested still shared!</span>
+
+<span class="cmt">// Fix — spread the nested object too</span>
+<span class="kw">let</span> user2 = { ...user, address: { ...user.address, city: <span class="str">"Mumbai"</span> } }</code></pre>
+          <div class="callout">💡 Spread on arrays works the same way: <span class="inline-code">[...arr]</span> creates a new array with the same items.</div>
+        </div>
+      </div>
+
+      <!-- 40 -->
+      <div class="topic-card" id="t40" data-title="mutation mutate in place array methods push pop splice sort avoid react">
+        <div class="topic-header">
+          <span class="topic-number">40</span>
+          <span class="topic-title">Mutation</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p><strong>Mutation = changing an existing thing in place</strong> instead of creating a new one.</p>
+          <pre><code><span class="cmt">// MUTATION — same object, value changed inside it</span>
+<span class="kw">const</span> user = { name: <span class="str">"Aman"</span>, age: <span class="num">22</span> }
+user.age = <span class="num">23</span>   <span class="cmt">// mutated</span>
+
+<span class="cmt">// NO MUTATION — brand new object created</span>
+<span class="kw">const</span> updated = { ...user, age: <span class="num">23</span> }   <span class="cmt">// original untouched</span></code></pre>
+          <p>Real world analogy: mutation = editing a Word doc and saving over the original. No mutation = making a copy and editing the copy.</p>
+          <p><strong>Array methods — which mutate and which don't:</strong></p>
+          <pre><code><span class="cmt">// ❌ These MUTATE the original — avoid in React</span>
+arr.<span class="fn">push</span>(<span class="num">4</span>)        <span class="cmt">// adds to original</span>
+arr.<span class="fn">pop</span>()          <span class="cmt">// removes from original</span>
+arr.<span class="fn">splice</span>(<span class="num">1</span>, <span class="num">1</span>)   <span class="cmt">// removes item at index</span>
+arr.<span class="fn">sort</span>()         <span class="cmt">// sorts the original</span>
+arr.<span class="fn">reverse</span>()      <span class="cmt">// reverses the original</span>
+
+<span class="cmt">// ✅ These return a NEW array — safe in React</span>
+[...arr, <span class="num">4</span>]                       <span class="cmt">// add</span>
+arr.<span class="fn">filter</span>(n => n !== <span class="num">2</span>)        <span class="cmt">// remove</span>
+arr.<span class="fn">map</span>(n => n * <span class="num">2</span>)             <span class="cmt">// transform</span>
+[...arr].<span class="fn">sort</span>()                   <span class="cmt">// sort safely — spread first</span></code></pre>
+          <div class="callout">💡 Ask yourself: "am I changing the original, or making something new?" In React, always make something new.</div>
+        </div>
+      </div>
+
+      <!-- 41 -->
+      <div class="topic-card" id="t41" data-title="memory garbage collection immutability performance spread new objects">
+        <div class="topic-header">
+          <span class="topic-number">41</span>
+          <span class="topic-title">Memory &amp; garbage collection</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>Creating new objects every state update looks wasteful — but JavaScript handles this automatically via <strong>garbage collection</strong>.</p>
+          <pre><code><span class="kw">let</span> user = { name: <span class="str">"Aman"</span>, age: <span class="num">22</span> }
+user = { ...user, age: <span class="num">23</span> }
+<span class="cmt">// old { name: "Aman", age: 22 } — nothing points to it anymore</span>
+<span class="cmt">// JS garbage collector sees this and frees that memory automatically</span></code></pre>
+          <p>You never manage memory manually in JavaScript (unlike C/C++). As soon as nothing references the old object, JS deletes it.</p>
+          <p>Also — React doesn't blindly re-render on every update. It:</p>
+          <pre><code><span class="cmt">// Only re-renders when state actually changes</span>
+<span class="cmt">// Compares old and new state — if same, skips everything</span>
+<span class="cmt">// Uses a virtual DOM to find the minimum real DOM changes needed</span></code></pre>
+          <table>
+            <tr><th></th><th>Mutation</th><th>No mutation (React way)</th></tr>
+            <tr><td>Memory</td><td>Slightly less</td><td>Tiny extra, GC cleans it up</td></tr>
+            <tr><td>Bugs</td><td>Hard — original silently changed</td><td>Predictable — old state intact</td></tr>
+            <tr><td>Re-render</td><td>May not trigger</td><td>Always triggers correctly</td></tr>
+            <tr><td>Debugging</td><td>Hard</td><td>Easy — compare old vs new state</td></tr>
+          </table>
+          <div class="callout">💡 For normal apps, memory is never the concern — correctness is. State objects are just a handful of strings and numbers, tiny compared to what modern hardware handles.</div>
+        </div>
+      </div>
+
+      <!-- 42 -->
+      <div class="topic-card" id="t42" data-title="spread override duplicate keys last wins order pattern setState update field">
+        <div class="topic-header">
+          <span class="topic-number">42</span>
+          <span class="topic-title">Spread override pattern</span>
+          <span class="topic-tag tag-concepts">Concepts</span>
+        </div>
+        <div class="topic-body">
+          <p>When you write <span class="inline-code">&#123; ...user, age: 23 &#125;</span>, <span class="inline-code">age</span> appears twice — but <strong>the last one wins</strong>.</p>
+          <pre><code><span class="kw">const</span> user = { name: <span class="str">"Aman"</span>, age: <span class="num">22</span> }
+
+{ ...user, age: <span class="num">23</span> }
+<span class="cmt">// expands to: { name: "Aman", age: 22, age: 23 }</span>
+<span class="cmt">// duplicate key — last one wins</span>
+<span class="cmt">// result:      { name: "Aman", age: 23 }  ✅</span></code></pre>
+          <p>Order matters — spread must come <strong>first</strong>, overrides <strong>after</strong>:</p>
+          <pre><code><span class="cmt">// ✅ spread first, override after — age becomes 23</span>
+{ ...user, age: <span class="num">23</span> }   <span class="cmt">// → { name: "Aman", age: 23 }</span>
+
+<span class="cmt">// ❌ override first, spread after — spread overwrites your value back</span>
+{ age: <span class="num">23</span>, ...user }   <span class="cmt">// → { name: "Aman", age: 22 }</span></code></pre>
+          <div class="callout">💡 Think of it as: "copy everything, then patch what I want to change." Always spread first, then write your overrides after.</div>
         </div>
       </div>
 
